@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("Islands┃2022, By Dark Fire#3774", "GrapeTheme")
+local Window = Library.CreateLib("Islands┃2022, By Empire ?#1576", "GrapeTheme")
 
 local Hub = Window:NewTab("Hub")
 
