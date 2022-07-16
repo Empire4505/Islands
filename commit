@@ -16,7 +16,7 @@ HubSection:NewDropdown("Discord:", "Discord:")
 
 HubSection:NewButton("Click to copy our discord link", "Click to copy our discord link", function()
     local clipBoard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
-    clipBoard("https://discord.gg/A5e75J97uu")
+    clipBoard("https://discord.gg/DkyFmtnVDF")
 end)
 
 local Main = Window:NewTab("Main")
