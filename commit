@@ -1,0 +1,527 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Islands┃2022, By Dark Fire#3774", "GrapeTheme")
+
+local Hub = Window:NewTab("Hub")
+
+local HubSection = Hub:NewSection("Discord:")
+
+local islandName
+for i,v in pairs(game.Workspace:GetDescendants()) do
+    if v.Name == "".. game.Players.LocalPlayer.UserId then
+        islandName = v.Parent.Parent
+    end 
+end
+
+HubSection:NewDropdown("Discord:", "Discord:")
+
+HubSection:NewButton("Click to copy our discord link", "Click to copy our discord link", function()
+    local clipBoard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
+    clipBoard("https://discord.gg/A5e75J97uu")
+end)
+
+local Main = Window:NewTab("Main")
+
+local MainSection = Main:NewSection("Options:")
+
+MainSection:NewToggle("Anti-Kick", "Anti-Kick", function(state)
+    if state then
+            local hook = game:GetService("Players").LocalPlayer.Kick;
+            local mt = getrawmetatable(game:GetService("Players").LocalPlayer)
+            local psuedoEnv = {
+                ["__index"] = mt.__index,
+                ["__namecall"] = mt.__namecall
+            }
+            local ReturnFunc = function()end
+
+            setreadonly(mt, false)
+            mt.__namecall = newcclosure(function(self, Index, ...)
+                local NameCallMethod = getnamecallmethod()
+                if type(NameCallMethod) == "string" then
+                    if NameCallMethod == "Kick" or NameCallMethod == "kick" then
+                        print("Prevented Kick At " .. tostring(os.time()))
+                        return ReturnFunc
+                    end
+                end
+                return psuedoEnv.__namecall(self, Index, ...)
+            end)
+
+            mt.__index = newcclosure(function(self, Index, ...)
+                if type(Index) == "string" then
+                    if Index == "Kick" or Index == "kick" then
+                        print("Prevented Kick At " .. tostring(os.time()))
+                        return ReturnFunc
+                    end
+                end
+                return psuedoEnv.__index(self, Index, ...)
+            end)
+            setreadonly(mt, true)
+
+    else
+    end
+end)
+
+MainSection:NewToggle("Anti-Afk", "Anti-Afk", function(state)
+    if state then
+    for _,v in next, getconnections(LocalPlayer.Idled) do
+    v:Disable()
+end
+    else
+    end
+end)
+
+MainSection:NewButton("FPS Booster", "FPS Booster", function()
+    local decalsyeeted = true
+local g = game
+local w = g.Workspace
+local l = g.Lighting
+local t = w.Terrain
+t.WaterWaveSize = 0
+t.WaterWaveSpeed = 0
+t.WaterReflectance = 0
+t.WaterTransparency = 0
+l.GlobalShadows = false
+l.FogEnd = 9e9
+l.Brightness = 0
+settings().Rendering.QualityLevel = "Level01"
+for i, v in pairs(g:GetDescendants()) do
+    if v:IsA("Part") or v:IsA("Union") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+        v.Material = "Plastic"
+        v.Reflectance = 0
+    elseif v:IsA("Decal") or v:IsA("Texture") and decalsyeeted then
+        v.Transparency = 1
+    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+        v.Lifetime = NumberRange.new(0)
+    elseif v:IsA("Explosion") then
+        v.BlastPressure = 1
+        v.BlastRadius = 1
+    elseif v:IsA("Fire") or v:IsA("SpotLight") or v:IsA("Smoke") then
+        v.Enabled = false
+    elseif v:IsA("MeshPart") then
+        v.Material = "Plastic"
+        v.Reflectance = 0
+        v.TextureID = 10385902758728957
+    end
+end
+for i, e in pairs(l:GetChildren()) do
+    if e:IsA("BlurEffect") or e:IsA("SunRaysEffect") or e:IsA("ColorCorrectionEffect") or e:IsA("BloomEffect") or e:IsA("DepthOfFieldEffect") then
+        e.Enabled = false
+    end
+end
+end)
+
+local PlayerSection = Main:NewSection("Player:")
+
+PlayerSection:NewSlider("WalkSpeed", "WalkSpeed", 500, 16, function(s)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
+end)
+
+PlayerSection:NewSlider("JumpPower", "JumpPower", 350, 50, function(s)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = s
+end)
+
+PlayerSection:NewButton("Reset WS/JP", "Reset WS/JP", function()
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
+end)
+
+local Farm = Window:NewTab("Farming")
+local FarmSection = Farm:NewSection("Crops:")
+
+local Crops = {}
+local Module = require(game:GetService("ReplicatedStorage").TS.tool["tool-meta"])
+for i,v in pairs(Module.ToolMeta) do
+    if string.find(i, "Seeds") and not string.find(i, "Flower") then
+        local TempThing = string.gsub(i, "Seeds", "")
+        Crops[TempThing] = TempThing
+    end
+end
+
+local SelectedCrop
+FarmSection:NewDropdown("Crop Options", "Crop Options", Crops, function(v)
+    SelectedCrop = v
+end)
+
+local FarmingCrops = false
+FarmSection:NewToggle("Farm Crops", "Farm Crops", function(bool)
+    FarmingCrops = bool
+    while FarmingCrops and task.wait() do
+        for i,v in pairs(islandName.Blocks:GetChildren()) do 
+            if FarmingCrops and v.Name == SelectedCrop then
+                if ( v.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position ).Magnitude > 23 then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame + Vector3.new(0,3,0)
+                end
+                local ohTable1 = {
+                	["player"] = game:GetService("Players").LocalPlayer,
+                	["player_tracking_category"] = "join_from_web",
+                	["model"] = v
+                }
+                StoredCFrame = v.CFrame
+                game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_HARVEST_CROP_REQUEST:InvokeServer(ohTable1)
+                task.wait()
+                local ohTable1 = {
+                	["upperBlock"] = false,
+                	["cframe"] = StoredCFrame,
+                	["player_tracking_category"] = "join_from_web",
+                	["blockType"] = SelectedCrop                }
+
+                game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_BLOCK_PLACE_REQUEST:InvokeServer(ohTable1)
+                task.wait()
+            end
+        end
+    end
+end)
+
+local FarmSection = Farm:NewSection("Wood:")
+FarmSection:NewToggle("Harvest Wood" , "Harvest Wood", function(state)
+    if state then
+                                 _G.harvestTree = true
+_G.ImGay = true
+while task.wait() and _G.ImGay do
+
+local plr = game.Players.LocalPlayer
+local char = plr.Character
+local human = char.HumanoidRootPart
+local myIsland
+
+--Tables--
+
+local Tree = {}
+
+for _,islands in pairs(game:GetService("Workspace").Islands:GetChildren()) do
+    for _,owner in pairs(islands.Owners:GetChildren()) do
+   if owner ~= plr.UserId then
+      myIsland = islands
+   end
+end
+end
+
+
+
+                                                   spawn(function()
+
+ do wait()
+   for _,Trees in pairs(myIsland.Blocks:GetChildren()) do
+      if Trees.Name:find("tree") then
+            table.insert(Tree, Trees)
+                     repeat 
+                         if Trees then
+                        human.CFrame = Trees.CFrame + Vector3.new(0,0,4)
+                        local args = {
+                           [1] = {
+                              ["player_tracking_category"] = "join_from_web",
+                              ["part"] = Trees,
+                              ["block"] = Trees,
+                              ["norm"] = Trees.Position,
+                              ["pos"] = Trees.Position
+                           }
+                        }
+                       while _G.harvestTree == true do
+
+
+                          game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_BLOCK_HIT_REQUEST:InvokeServer(unpack(args))
+                          wait()
+                       end
+                    end
+
+                      until Trees.Parent == nil      
+
+end          end
+      end
+                                                   end)
+end
+    else
+    end
+end)
+
+local FarmSection = Farm:NewSection("Ores:")
+FarmSection:NewButton("Coming Soon", "Coming Soon", function()
+    end)
+
+local FarmSection = Farm:NewSection("Other:")
+FarmSection:NewToggle("Shear Trees", "Shear Trees", function(state)
+    if state then
+        _G.TreeEnabled = true
+
+        game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild("clippers"))
+        spawn(function()
+            while game.RunService.Heartbeat:wait() and _G.TreeEnabled do
+                for i,v in pairs(game:GetService("Workspace").Islands:FindFirstChildOfClass("Model").Blocks:GetChildren()) do
+                    if v.Name:match("tree") then
+
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+                            game.ReplicatedStorage.rbxts_include.node_modules.net.out._NetManaged.CLIENT_TRIM_TREE_REQUEST:InvokeServer({["tree"] = v})
+                    end
+                end
+            end
+        end)    else
+    end
+end)
+
+FarmSection:NewToggle("Collect Flowers", "Collect Flowers", function(state)
+    if state then
+
+        enabled = true
+
+        local FlowerBag = {}
+
+        for i, v in ipairs(game:GetService("Workspace").Islands:FindFirstChildOfClass("Model").Blocks:GetChildren()) do
+            if enabled and v.Name:lower():match("flower")  then
+                local flower = v
+                    local flowName, flowPos = flower.Name, flower.CFrame
+                    table.insert(FlowerBag, v)
+            end
+        end
+
+        for j,k in ipairs(FlowerBag) do
+            local flower = k
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = flower.CFrame
+            game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.client_request_1:InvokeServer({["flower"] = flower})
+        end
+
+
+    else
+        enabled = false
+
+    end
+end)
+
+local Mobs = Window:NewTab("Creatures")
+local MobsSection = Mobs:NewSection("Mobs:")
+MobsSection:NewButton("Coming Soon", "Coming Soon", function()
+end)
+local MobsSection = Mobs:NewSection("Bosses:")
+MobsSection:NewButton("Coming Soon", "Coming Soon", function()
+end)
+local MobsSection = Mobs:NewSection("Fishing:")
+MobsSection:NewToggle("Auto Fish" , "Auto Fish", function(state)
+    if state then
+        while task.wait(1) do
+            local args = {
+                [1] = {
+                    ["playerLocation"] = Vector3.new(965.0799560546875, 287.529541015625, -1686.6474609375),
+                    ["direction"] = Vector3.new(-0.07688691467046738, -8.697181863581704e-10, 0.997039794921875),
+                    ["strength"] = 0.2173611323038737
+                }
+            }
+
+            game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_CAST_FISHING_ROD:InvokeServer(unpack(args))
+            wait(5)
+            local args = {
+                [1] = {
+                    ["success"] = true
+                }
+            }
+
+            game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.FishCaught:FireServer(unpack(args))
+            end
+    else
+    end
+end)
+local MobsSection = Mobs:NewSection("Other:")
+MobsSection:NewButton("Coming Soon", "Coming Soon", function()
+end)
+
+local Machinery = Window:NewTab("Machinery")
+
+local SmeltSection = Machinery:NewSection("Smelting:")
+
+local oreOption;
+
+local typeOption;
+
+SmeltSection:NewDropdown("Furnace Options", "smelterIndustrial", {"smelterIndustrial", "smallFurnace"}, function(Option)
+    typeOption = Option
+end)
+
+SmeltSection:NewDropdown("Ore Options", "Ore Options", {"ironOre", "copperOre", "goldOre", "clay"}, function(currentOption)
+    oreOption = currentOption
+end)
+
+SmeltSection:NewToggle("Smelt Items", "Smelt Items", function(state)
+    if state then
+        _G.AutoSmeltEnabled = true
+
+islandSmelters = {}
+for i, v in pairs(game:GetService("Workspace").Islands:FindFirstChildOfClass("Model").Blocks:GetChildren()) do
+    if v.Name == (typeOption) then
+        table.insert(islandSmelters, v)
+    end
+end
+
+spawn(function()
+    while wait(0.5) and _G.AutoSmeltEnabled do
+            for i, v in pairs(islandSmelters) do
+                local smelter = v
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = smelter.CFrame + Vector3.new(0, 10, 0)
+
+                for j, k in pairs(smelter.WorkerContents:GetChildren()) do
+                    if k.Name ~= (oreOption) then
+                        game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_TOOL_PICKUP_REQUEST:InvokeServer({
+                          ["tool"] = k
+                    		})
+                    end
+                end
+
+                -- deposit copper Ore
+                game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer({
+                    ["block"] = smelter,
+                    ["amount"] = 1,
+                    ["toolName"] = (oreOption)
+                })
+                -- add some coal
+                game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer({
+                    ["block"] = smelter,
+                    ["amount"] = 1,
+                    ["toolName"] = "coal"
+                })
+                -- remove anything inside the smelter thats not copper ore
+
+                spawn(function()
+
+                end)
+end
+end
+end)
+end
+
+end)
+
+local CutSection = Machinery:NewSection("Cutting:")
+
+local stoneOption;
+
+local cutOption;
+
+CutSection:NewDropdown("Cutter Options", "Cutter Options", {"stonecutter", "stonecutterIndustrial"}, function(userq)
+     cutOption = userq
+end)
+
+CutSection:NewDropdown("Block Options", "Block Options", {"stone", "marble", "slate"}, function(cut)
+    stoneOption = cut
+end)
+
+CutSection:NewToggle("Cut Items", "Cut Items", function(state)
+    if state then
+        _G.AutoSmeltEnabled = true
+
+islandSmelters = {}
+for i, v in pairs(game:GetService("Workspace").Islands:FindFirstChildOfClass("Model").Blocks:GetChildren()) do
+    if v.Name == (cutOption) then
+        table.insert(islandSmelters, v)
+    end
+end
+
+spawn(function()
+    while wait(0.5) and _G.AutoSmeltEnabled do
+            for i, v in pairs(islandSmelters) do
+                local smelter = v
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = smelter.CFrame + Vector3.new(0, 10, 0)
+
+
+                game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer({
+                    ["block"] = smelter,
+                    ["amount"] = 1,
+                    ["toolName"] = (stoneOption)
+                })
+                game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer({
+                    ["block"] = smelter,
+                    ["amount"] = 1,
+                    ["toolName"] = "coal"
+                })
+
+                spawn(function()
+                end)
+                end
+end 
+end)
+    else
+    end
+end)
+
+local PolishSection = Machinery:NewSection("Polish:")
+PolishSection:NewButton("Coming Soon", "Coming Soon", function()
+end)
+
+local UpgradeSection = Machinery:NewSection("Upgrade Totems:")
+UpgradeSection:NewButton("Coming Soon (Premium)", "Coming Soon (Premium)", function()
+end)
+
+local SawSection = Machinery:NewSection("Sawing:")
+
+local woodOption;
+
+local sawOption;
+
+SawSection:NewDropdown("Saw Options", "Saw Options", {"sawmill", "sawmillIndustrial"}, function(userp)
+    sawOption = userp
+end)
+
+SawSection:NewDropdown("Wood Options", "Wood Options", {"wood", "woodPine", "woodBirch", "woodMaple", "woodHickory"}, function(current)
+    woodOption = current
+end)
+
+SawSection:NewToggle("Saw Items", "Saw Items", function(state)
+    if state then
+        _G.AutoSmeltEnabled = true
+
+islandSmelters = {}
+for i, v in pairs(game:GetService("Workspace").Islands:FindFirstChildOfClass("Model").Blocks:GetChildren()) do
+    if v.Name == (sawOption) then
+        table.insert(islandSmelters, v)
+    end
+end
+
+spawn(function()
+    while wait(0.5) and _G.AutoSmeltEnabled do
+            for i, v in pairs(islandSmelters) do
+                local smelter = v
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = smelter.CFrame + Vector3.new(0, 10, 0)
+
+
+                game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer({
+                    ["block"] = smelter,
+                    ["amount"] = 1,
+                    ["toolName"] = (woodOption)
+                })
+                game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer({
+                    ["block"] = smelter,
+                    ["amount"] = 1,
+                    ["toolName"] = "coal"
+                })
+
+                spawn(function()
+                end)
+                end
+end 
+end)
+    else
+    end
+end)
+
+local CompSection = Machinery:NewSection("Compost:")
+CompSection:NewButton("Coming Soon", "Coming Soon", function()
+end)
+
+local CrateSection = Machinery:NewSection("Crate:")
+CrateSection:NewButton("Coming Soon", "Coming Soon", function()
+end)
+
+local OtherSection = Machinery:NewSection("Other:")
+OtherSection:NewToggle("Collect Near Items", "Collect Near Items", function(state)
+    if state then
+        _G.ImGay = true
+        while task.wait() and _G.ImGay do
+                                for i, v in pairs(game:GetService("Workspace").Islands:FindFirstChildOfClass("Model").Drops:GetChildren()) do
+                                if v:IsA('Tool') then
+                                    local tool = {
+                                        ["tool"] = v
+                                    }
+                                    game:GetService("ReplicatedStorage").rbxts_include.node_modules.net.out._NetManaged.CLIENT_TOOL_PICKUP_REQUEST:InvokeServer(tool)
+                    end
+
+                                end
+        end    else
+    end
+end)
+
+local Misc = Window:NewTab("Misc")
